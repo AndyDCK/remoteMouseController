@@ -13,8 +13,17 @@ const App: React.FC = () => {
     };
 
     ws.onmessage = (event) => {
-      console.log('Message from server:', event.data);
-      setServerMessage(event.data);
+      console.log('Message from server (raw):', event.data);
+
+      // Tente de convertir les données en JSON
+      try {
+        const message = JSON.parse(event.data as string);
+        if (message.message) {
+          setServerMessage(message.message); // Affiche le message contenu dans l'objet JSON
+        }
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+      }
     };
 
     ws.onclose = (event) => {
@@ -40,7 +49,7 @@ const App: React.FC = () => {
 
     // Capturer les mouvements tactiles pour les appareils mobiles
     const handleTouchMove = (event: TouchEvent) => {
-      event.preventDefault();  // Empêche le comportement par défaut du navigateur
+      event.preventDefault(); // Empêche le comportement par défaut du navigateur
       const touch = event.touches[0];
       const { clientX, clientY } = touch;
       setCursorPosition({ x: clientX, y: clientY });
